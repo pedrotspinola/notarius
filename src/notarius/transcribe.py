@@ -161,19 +161,88 @@ def transcribe(
         report("assign", "Assigning speakers...")
         result = whisperx.assign_word_speakers(diarized, result)
 
-    segments = [
-        TranscriptionSegment(
-            start=float(seg["start"]),
-            end=float(seg["end"]),
-            text=seg.get("text", "").strip(),
-            speaker_label=seg.get("speaker", "UNKNOWN"),
-        )
-        for seg in result["segments"]
-        if seg.get("text", "").strip()
-    ]
+    segments = split_at_speaker_changes(result["segments"])
     report("done", f"{len(segments)} segments, "
                    f"{len({s.speaker_label for s in segments})} speakers")
     return segments
+
+
+# A run of words this short, credited to another speaker in the middle of a
+# segment, is more likely one misassigned word than a real reply.
+MIN_RUN_WORDS = 3
+MIN_RUN_SECONDS = 1.0
+
+
+def split_at_speaker_changes(raw_segments: list[dict]) -> list[TranscriptionSegment]:
+    """Turn WhisperX segments into one segment per speaker run.
+
+    Whisper often makes one segment across a change of speaker (a quick
+    reply right after someone finishes).  The segment's own speaker is
+    whoever spoke most of it, so the other person's words would be credited
+    to them.  Every word carries its own speaker, so segments are split
+    where the speaker changes; very short runs merge into their neighbour.
+    """
+    out: list[TranscriptionSegment] = []
+    for seg in raw_segments:
+        text = seg.get("text", "").strip()
+        if not text:
+            continue
+        default = seg.get("speaker", "UNKNOWN")
+        words = [w for w in seg.get("words") or [] if w.get("word", "").strip()]
+        if not words:
+            out.append(TranscriptionSegment(float(seg["start"]), float(seg["end"]), text, default))
+            continue
+
+        runs: list[list] = []  # [speaker, words]
+        last = None
+        for w in words:
+            speaker = w.get("speaker") or last or default
+            last = speaker
+            if runs and runs[-1][0] == speaker:
+                runs[-1][1].append(w)
+            else:
+                runs.append([speaker, [w]])
+
+        def seconds(ws: list[dict]) -> float:
+            starts = [w["start"] for w in ws if "start" in w]
+            ends = [w["end"] for w in ws if "end" in w]
+            return (max(ends) - min(starts)) if starts and ends else 0.0
+
+        def short(ws: list[dict]) -> bool:
+            return len(ws) < MIN_RUN_WORDS and seconds(ws) < MIN_RUN_SECONDS
+
+        # Repeatedly fold the shortest run into its larger neighbour while
+        # it is too short to be a real reply, so a single misassigned word
+        # always loses to the speaker around it.
+        while len(runs) > 1:
+            i = min(range(len(runs)), key=lambda k: (len(runs[k][1]), seconds(runs[k][1])))
+            if not short(runs[i][1]):
+                break
+            neighbours = [j for j in (i - 1, i + 1) if 0 <= j < len(runs)]
+            j = max(neighbours, key=lambda k: (len(runs[k][1]), k < i))
+            if j < i:
+                runs[j][1].extend(runs[i][1])
+            else:
+                runs[j][1][:0] = runs[i][1]
+            del runs[i]
+            coalesced: list[list] = []
+            for run in runs:
+                if coalesced and coalesced[-1][0] == run[0]:
+                    coalesced[-1][1].extend(run[1])
+                else:
+                    coalesced.append(run)
+            runs = coalesced
+
+        for speaker, ws in runs:
+            starts = [w["start"] for w in ws if "start" in w]
+            ends = [w["end"] for w in ws if "end" in w]
+            out.append(TranscriptionSegment(
+                start=float(min(starts)) if starts else float(seg["start"]),
+                end=float(max(ends)) if ends else float(seg["end"]),
+                text=" ".join(w["word"].strip() for w in ws),
+                speaker_label=speaker,
+            ))
+    return out
 
 
 def transcribe_per_participant(

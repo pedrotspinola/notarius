@@ -51,3 +51,17 @@ def test_json_round_trip(tmp_path):
     assert loaded.segments == m.segments
     assert loaded.tracks == m.tracks and loaded.events == m.events
     assert loaded.date == m.date and loaded.render_text() == m.render_text()
+
+
+def test_rename_speaker_command(tmp_path):
+    from notarius.cli import main
+
+    path = tmp_path / "r.json"
+    Meeting("Reunião", "file", "/x.mkv", list(SEGMENTS)).save(path)
+    main(["rename-speaker", str(path), "Iolanda", "--from", "Desconhecido 1"])
+    m = Meeting.load(path)
+    assert [s.speaker_name for s in m.segments].count("Iolanda") == 1
+    assert m.segments[2].origin == "review"
+    assert "Iolanda [00:00:05]: Oi." in path.with_suffix(".txt").read_text(encoding="utf-8")
+    main(["rename-speaker", str(path), "Vicente", "--label", "SPEAKER_00"])
+    assert [s.speaker_name for s in Meeting.load(path).segments][:2] == ["Vicente", "Vicente"]

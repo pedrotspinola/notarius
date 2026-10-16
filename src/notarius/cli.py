@@ -83,6 +83,15 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--dry-run", action="store_true", help="show the plan only")
     _add_device_args(p, whisper=False)
 
+    p = sub.add_parser("rename-speaker",
+                       help="rename a speaker in a saved meeting (rewrites its .txt)")
+    p.add_argument("meeting", type=Path, help="the meeting's .json file")
+    p.add_argument("name", help="the correct name")
+    target = p.add_mutually_exclusive_group(required=True)
+    target.add_argument("--label", help="every segment of this diarization label")
+    target.add_argument("--segments", help="comma-separated segment indices")
+    target.add_argument("--from", dest="from_name", help="every segment now named this")
+
     p = sub.add_parser("profiles", help="list, rename or delete voice profiles")
     ps = p.add_subparsers(dest="profiles_command")
     d = ps.add_parser("delete")
@@ -185,6 +194,23 @@ def _cmd_enroll_meeting(args: argparse.Namespace) -> None:
               f"{o.self_similarity:.2f}{note}", file=sys.stderr)
 
 
+def _cmd_rename_speaker(args: argparse.Namespace) -> None:
+    from notarius.meeting import Meeting
+    from notarius.review import apply_answers, rename_segments
+
+    meeting = Meeting.load(args.meeting)
+    if args.label:
+        n = apply_answers(meeting, {f"label:{args.label}": args.name})[f"label:{args.label}"]
+    else:
+        if args.segments:
+            indices = [int(i) for i in args.segments.split(",") if i.strip()]
+        else:
+            indices = [i for i, s in enumerate(meeting.segments) if s.speaker_name == args.from_name]
+        n = rename_segments(meeting, indices, args.name)
+    txt = meeting.save(args.meeting)
+    print(f"{n} segment(s) renamed; transcript rewritten: {txt}", file=sys.stderr)
+
+
 def _cmd_profiles(args: argparse.Namespace) -> None:
     from notarius.profiles import delete_person, delete_profile, list_profiles, rename_person
 
@@ -241,6 +267,7 @@ _COMMANDS = {
     "enroll": _cmd_enroll,
     "enroll-whatsapp": _cmd_enroll_whatsapp,
     "enroll-meeting": _cmd_enroll_meeting,
+    "rename-speaker": _cmd_rename_speaker,
     "profiles": _cmd_profiles,
     "aliases": _cmd_aliases,
 }

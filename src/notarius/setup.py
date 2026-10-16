@@ -67,8 +67,10 @@ def download_models(whisper_model: str, progress: Progress | None = None) -> Non
 
 
 def run_setup(progress: Progress | None = None, speed_test: bool = True) -> dict:
+    from notarius.datafolder import ensure_data_folder
     from notarius.tuning import choose_settings, run_speed_test
 
+    ensure_data_folder()
     choice = choose_settings()
     download_models(choice.whisper_model, progress)
     result = {

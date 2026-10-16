@@ -511,6 +511,9 @@ def serve(port: int = DEFAULT_PORT, open_browser: bool = True) -> None:
         print("O Notarius já está aberto; abrindo o navegador.")
         webbrowser.open(f"http://127.0.0.1:{port}/")
         return
+    from notarius.datafolder import ensure_data_folder
+
+    ensure_data_folder()
     app = App(port)
     httpd = ThreadingHTTPServer(("127.0.0.1", port), _make_handler(app))
     url = f"http://127.0.0.1:{port}/"

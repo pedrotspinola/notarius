@@ -13,6 +13,7 @@ Layout inside the zip (what the user sees after "Extract All"):
 from __future__ import annotations
 
 import re
+import subprocess
 import zipfile
 from pathlib import Path
 
@@ -55,6 +56,13 @@ Mais informações: https://github.com/pedrotspinola/notarius
 """
 
 
+def tracked_files(dirs: list[str]) -> list[str]:
+    """Only files committed to git: a stray local file never ships."""
+    out = subprocess.run(["git", "ls-files", "-z", "--", *dirs], cwd=ROOT,
+                         capture_output=True, check=True).stdout
+    return sorted(p for p in out.decode("utf-8").split("\0") if p)
+
+
 def version() -> str:
     text = (ROOT / "src" / "notarius" / "__init__.py").read_text(encoding="utf-8")
     return re.search(r'__version__ = "([^"]+)"', text).group(1)
@@ -66,10 +74,8 @@ def main() -> None:
     out = ROOT / "dist" / f"{top}.zip"
     out.parent.mkdir(exist_ok=True)
     files: list[tuple[Path, str]] = [(ROOT / f, f"{top}/app/{f}") for f in APP_FILES]
-    for d in APP_DIRS:
-        for p in sorted((ROOT / d).rglob("*")):
-            if p.is_file() and "__pycache__" not in p.parts:
-                files.append((p, f"{top}/app/{p.relative_to(ROOT).as_posix()}"))
+    for rel in tracked_files(APP_DIRS):
+        files.append((ROOT / rel, f"{top}/app/{rel}"))
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
         z.write(ROOT / "windows" / "Instalar Notarius.cmd", f"{top}/Instalar Notarius.cmd")
         z.writestr(f"{top}/LEIA-ME.txt",

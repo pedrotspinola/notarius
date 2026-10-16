@@ -51,6 +51,14 @@ Open **Notarius**. Your browser shows the app.
 Transcripts are saved in `Notarius\Transcrições` inside your user folder,
 as a `.txt` you can open in any editor.
 
+## With an AI agent (optional)
+
+If you use Codex, Claude Code or a similar agent, open it in your
+`Notarius` folder. Notarius keeps an `AGENTS.md` there with everything the
+agent needs to help you review meetings — and a `Notas` folder where it
+writes down what it learns about your people and groups. The agent never
+starts transcriptions; those run in the app.
+
 ## How it works
 
 Speech recognition with [Whisper](https://github.com/openai/whisper)

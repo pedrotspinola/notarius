@@ -53,6 +53,14 @@ Abra o **Notarius**. O navegador mostra o programa.
 As transcrições ficam em `Notarius\Transcrições`, dentro da sua pasta de
 usuário, como um `.txt` que abre em qualquer editor.
 
+## Com um agente de IA (opcional)
+
+Se você usa o Codex, o Claude Code ou um agente parecido, abra-o na sua
+pasta `Notarius`. O Notarius mantém ali um `AGENTS.md` com tudo o que o
+agente precisa para ajudar a revisar reuniões — e uma pasta `Notas` onde
+ele anota o que aprende sobre as suas pessoas e grupos. O agente nunca
+começa transcrições; elas rodam no aplicativo.
+
 ## Como funciona
 
 Reconhecimento de fala com o [Whisper](https://github.com/openai/whisper)

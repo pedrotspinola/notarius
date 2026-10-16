@@ -95,13 +95,15 @@ jobs:
           $env:PATH = (Join-Path $root 'ffmpeg') + ';' + $env:PATH
           # Only the model setup chose for this machine is downloaded.
           $env:NOTARIUS_TEST_MODEL = (Get-Content (Join-Path $root 'tuning.json') | ConvertFrom-Json).whisper_model
+          $env:NOTARIUS_TEST_KEEP = Join-Path $PWD 'ci-logs\e2e'
+          New-Item -ItemType Directory -Force -Path $env:NOTARIUS_TEST_KEEP | Out-Null
           & $py -m pytest tests -m slow -p no:cacheprovider -rA
           if ($LASTEXITCODE -ne 0) { throw 'end-to-end tests failed' }
       - name: Collect the logs
         if: always()
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path ci-logs | Out-Null
+          New-Item -ItemType Directory -Force -Path ci-logs | Out-Null  # e2e meetings are already there
           $root = Join-Path $env:LOCALAPPDATA 'Notarius'
           foreach ($f in (Join-Path $root 'instalacao.log'), (Join-Path $root 'tuning.json'), 'app.log', 'app.err') {
             if (Test-Path $f) { Copy-Item $f ci-logs\ }

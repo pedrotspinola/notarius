@@ -73,7 +73,12 @@ def workdir(tmp_path_factory) -> Path:
     for name in TRUTH["enrolled"]:
         enroll_from_files(name, [FIXTURES / "voices" / f"{name}.opus"],
                           settings.profiles_dir, settings.device)
-    return tmp
+    yield tmp
+    keep = os.environ.get("NOTARIUS_TEST_KEEP")
+    if keep:  # CI uploads these, so a failure can be read afterwards
+        import shutil
+
+        shutil.copytree(settings.meetings_dir, Path(keep) / "Transcrições", dirs_exist_ok=True)
 
 
 def test_meeting_identifies_enrolled_and_keeps_stranger_unknown(workdir):

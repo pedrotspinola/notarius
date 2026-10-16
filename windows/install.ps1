@@ -169,6 +169,7 @@ if (-not $SkipSetup) {
     Say '  Isto baixa cerca de 5 GB e pode levar de 15 minutos a uma hora.'
     Say '  Se a internet cair, rode o instalador de novo: ele continua de onde parou.'
     & $Python -m notarius setup
+    if ($LASTEXITCODE -ne 0 -and $Unattended) { Fail 'A preparação dos modelos falhou.' }
     if ($LASTEXITCODE -ne 0) {
         Say ''
         Say 'A preparação não terminou. Você pode completá-la depois pelo próprio'

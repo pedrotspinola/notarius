@@ -97,16 +97,22 @@ jobs:
           $env:NOTARIUS_TEST_MODEL = (Get-Content (Join-Path $root 'tuning.json') | ConvertFrom-Json).whisper_model
           & $py -m pytest tests -m slow -p no:cacheprovider -rA
           if ($LASTEXITCODE -ne 0) { throw 'end-to-end tests failed' }
+      - name: Collect the logs
+        if: always()
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path ci-logs | Out-Null
+          $root = Join-Path $env:LOCALAPPDATA 'Notarius'
+          foreach ($f in (Join-Path $root 'instalacao.log'), (Join-Path $root 'tuning.json'), 'app.log', 'app.err') {
+            if (Test-Path $f) { Copy-Item $f ci-logs\ }
+          }
+          Get-ChildItem (Join-Path $root 'jobs') -Filter *.log -ErrorAction SilentlyContinue | Copy-Item -Destination ci-logs\
       - name: Keep the logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: install-logs
-          path: |
-            ~\AppData\Local\Notarius\instalacao.log
-            ~\AppData\Local\Notarius\tuning.json
-            app.log
-            app.err
+          path: ci-logs
           if-no-files-found: ignore
 
   release:

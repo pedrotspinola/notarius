@@ -515,6 +515,10 @@ def serve(port: int = DEFAULT_PORT, open_browser: bool = True) -> None:
     httpd = ThreadingHTTPServer(("127.0.0.1", port), _make_handler(app))
     url = f"http://127.0.0.1:{port}/"
     _disable_quick_edit()
+    if sys.platform == "win32":
+        import ctypes
+
+        ctypes.windll.kernel32.SetConsoleTitleW("Notarius — não feche esta janela")
     print(f"Notarius {__version__} — aberto em {url}")
     print("Pode minimizar esta janela, mas não a feche: fechar encerra o Notarius.")
     if open_browser:

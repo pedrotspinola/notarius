@@ -1,0 +1,6 @@
+# Windows scripts keep their CRLF line endings and BOM exactly as committed.
+*.ps1 -text
+*.cmd -text
+*.ico binary
+*.bin binary
+*.opus binary

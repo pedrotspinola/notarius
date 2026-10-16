@@ -18,3 +18,6 @@ Vozes/
 
 # Except the test recordings
 !tests/fixtures/**/*.opus
+
+# Release builds
+dist/

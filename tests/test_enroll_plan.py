@@ -70,3 +70,14 @@ def test_zoom_track_uses_own_file_and_skips_enrolled(tmp_path):
     assert plans["Odete"].action == "enroll"
     assert {c.audio for c in plans["Odete"].clips} == {"/z/odete.m4a"}
     assert plans["Vicente"].code == "already_enrolled"
+
+
+def test_long_turns_are_cut_into_several_clips(tmp_path):
+    # Three 20-second turns: 60 s of clean speech, not 3 x 12 s.
+    p = plans_by_person(meeting(long_turns("Odete", 0, 3, each=20.0, gap=40.0)), tmp_path)["Odete"]
+    assert (p.action, p.code) == ("enroll", "new_person")
+    assert p.clean_seconds == 60.0
+    assert all(c.end - c.start <= 12.0 for c in p.clips)
+    # Every turn contributes before any turn contributes twice.
+    starts = sorted(c.start for c in p.clips)
+    assert {0.0, 40.0, 80.0} <= set(starts)

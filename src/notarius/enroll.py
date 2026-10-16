@@ -95,15 +95,25 @@ def _clean_clips(meeting: Meeting, person: str) -> list[Clip]:
     """
     own = [s for s in meeting.segments if s.speaker_name == person]
     others = [s for s in meeting.segments if s.speaker_name != person]
-    clips: list[Clip] = []
-    for s in own:
+    pieces_per_segment: list[list[Clip]] = []
+    for s in sorted(own, key=lambda s: s.end - s.start, reverse=True):
         if s.end - s.start < MIN_CLIP:
             continue
         if any(o.start < s.end and s.start < o.end for o in others):
             continue
         audio = meeting.tracks.get(s.label, meeting.source_path)
-        clips.append(Clip(s.start, min(s.end, s.start + MAX_CLIP), audio))
-    clips.sort(key=lambda c: c.end - c.start, reverse=True)
+        # A long turn is the cleanest material there is: cut it into
+        # several clips instead of keeping only its first seconds.
+        pieces, t = [], s.start
+        while s.end - t >= MIN_CLIP:
+            pieces.append(Clip(t, min(s.end, t + MAX_CLIP), audio))
+            t += MAX_CLIP
+        pieces_per_segment.append(pieces)
+    # Round robin across turns, longest turns first, so one monologue does
+    # not fill every slot.
+    clips: list[Clip] = []
+    for round_ in range(max((len(p) for p in pieces_per_segment), default=0)):
+        clips += [p[round_] for p in pieces_per_segment if round_ < len(p)]
     return clips
 
 

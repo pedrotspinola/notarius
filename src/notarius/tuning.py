@@ -26,9 +26,11 @@ from notarius.config import (
 
 TUNING_FILE = APP_DIR / "tuning.json"
 FAST_WHISPER_MODEL = "dropbox-dash/faster-whisper-large-v3-turbo"
-# Below this much RAM the large model is not attempted (see measurements in
-# the setup docs); the turbo model needs about half.
-MIN_RAM_GB_LARGE = 8.0
+# Peak memory of the whole pipeline on CPU (int8), measured on a 2-minute
+# sample: large-v3 5.9 GB, turbo 4.5 GB; a two-hour meeting adds roughly
+# half a gigabyte of decoded audio.  Windows itself takes 2.5-3 GB, so on an
+# 8 GB laptop large-v3 would swap heavily; it is chosen from 12 GB up.
+MIN_RAM_GB_LARGE = 12.0
 # GPUs with less video memory than this run out of memory with the full
 # pipeline; the CPU is used instead.
 MIN_VRAM_GB = 6.0

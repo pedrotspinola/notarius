@@ -38,3 +38,14 @@ def test_rename_person_moves_variants_and_refuses_merges(tmp_path):
     }
     with pytest.raises(ValueError):
         rename_person("Vicente", "Odete Prado", tmp_path)
+
+
+def test_model_choice_by_memory(monkeypatch):
+    import notarius.tuning as tuning
+
+    monkeypatch.setattr(tuning, "gpu_vram_gb", lambda: None)
+    for ram, expected in ((8.0, tuning.FAST_WHISPER_MODEL), (11.9, tuning.FAST_WHISPER_MODEL),
+                          (16.0, "large-v3"), (None, "large-v3")):
+        monkeypatch.setattr(tuning, "total_ram_gb", lambda r=ram: r)
+        choice = tuning.choose_settings()
+        assert (choice.device, choice.whisper_model) == ("cpu", expected), ram

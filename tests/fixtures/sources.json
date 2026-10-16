@@ -1,0 +1,533 @@
+{
+ "_about": "Clip boundaries from Multilingual LibriSpeech (Pratap et al. 2020, CC BY 4.0, https://www.openslr.org/94/); audio cut from the public-domain LibriVox recordings on archive.org.",
+ "voices": [
+  {
+   "name": "Voz 01",
+   "mls_speaker": "11247",
+   "enroll": [
+    {
+     "id": "11247_10229_000000",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_10_aranha_64kb.mp3",
+     "start": 1889.48,
+     "end": 1909.48
+    },
+    {
+     "id": "11247_10229_000001",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_10_aranha_64kb.mp3",
+     "start": 2089.48,
+     "end": 2109.48
+    },
+    {
+     "id": "11247_10229_000002",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_10_aranha_64kb.mp3",
+     "start": 963.59,
+     "end": 976.05
+    }
+   ],
+   "meeting": [
+    {
+     "id": "11247_10229_000003",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_10_aranha_64kb.mp3",
+     "start": 1369.48,
+     "end": 1389.48
+    },
+    {
+     "id": "11247_10229_000004",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_10_aranha_64kb.mp3",
+     "start": 1074.14,
+     "end": 1093.53
+    },
+    {
+     "id": "11247_10229_000005",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_10_aranha_64kb.mp3",
+     "start": 2149.48,
+     "end": 2169.48
+    }
+   ]
+  },
+  {
+   "name": "Voz 02",
+   "mls_speaker": "12114",
+   "enroll": [
+    {
+     "id": "12114_10229_000000",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_06_aranha_64kb.mp3",
+     "start": 757.14,
+     "end": 774.12
+    },
+    {
+     "id": "12114_10229_000001",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_06_aranha_64kb.mp3",
+     "start": 185.56,
+     "end": 202.0
+    },
+    {
+     "id": "12114_10229_000002",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_06_aranha_64kb.mp3",
+     "start": 1357.29,
+     "end": 1371.82
+    }
+   ],
+   "meeting": [
+    {
+     "id": "12114_10229_000004",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_06_aranha_64kb.mp3",
+     "start": 79.83,
+     "end": 97.37
+    },
+    {
+     "id": "12114_10229_000005",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_06_aranha_64kb.mp3",
+     "start": 1777.54,
+     "end": 1797.23
+    },
+    {
+     "id": "12114_10229_000006",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_06_aranha_64kb.mp3",
+     "start": 2233.43,
+     "end": 2249.58
+    }
+   ]
+  },
+  {
+   "name": "Voz 03",
+   "mls_speaker": "12670",
+   "enroll": [
+    {
+     "id": "12670_13396_000001",
+     "url": "https://archive.org/download/contos_do_norte_1812_librivox/contosdonorte_6_marquesdecarvalho_64kb.mp3",
+     "start": 217.6,
+     "end": 233.73
+    },
+    {
+     "id": "12670_13396_000002",
+     "url": "https://archive.org/download/contos_do_norte_1812_librivox/contosdonorte_6_marquesdecarvalho_64kb.mp3",
+     "start": 421.55,
+     "end": 433.75
+    },
+    {
+     "id": "12670_13396_000003",
+     "url": "https://archive.org/download/contos_do_norte_1812_librivox/contosdonorte_6_marquesdecarvalho_64kb.mp3",
+     "start": 200.1,
+     "end": 217.6
+    }
+   ],
+   "meeting": [
+    {
+     "id": "12670_13396_000004",
+     "url": "https://archive.org/download/contos_do_norte_1812_librivox/contosdonorte_6_marquesdecarvalho_64kb.mp3",
+     "start": 69.01,
+     "end": 87.99
+    },
+    {
+     "id": "12670_13396_000005",
+     "url": "https://archive.org/download/contos_do_norte_1812_librivox/contosdonorte_6_marquesdecarvalho_64kb.mp3",
+     "start": 465.32,
+     "end": 482.63
+    },
+    {
+     "id": "12670_13396_000007",
+     "url": "https://archive.org/download/contos_do_norte_1812_librivox/contosdonorte_6_marquesdecarvalho_64kb.mp3",
+     "start": 115.24,
+     "end": 131.71
+    }
+   ]
+  },
+  {
+   "name": "Voz 04",
+   "mls_speaker": "7925",
+   "enroll": [
+    {
+     "id": "7925_6390_000000",
+     "url": "https://archive.org/download/antologia_brasileira_v1_1708_librivox/antologiabrasileira1_45_various_64kb.mp3",
+     "start": 228.6,
+     "end": 243.97
+    },
+    {
+     "id": "7925_6390_000001",
+     "url": "https://archive.org/download/antologia_brasileira_v1_1708_librivox/antologiabrasileira1_44_various_64kb.mp3",
+     "start": 87.19,
+     "end": 102.33
+    },
+    {
+     "id": "7925_6390_000002",
+     "url": "https://archive.org/download/antologia_brasileira_v1_1708_librivox/antologiabrasileira1_45_various_64kb.mp3",
+     "start": 84.97,
+     "end": 98.91
+    }
+   ],
+   "meeting": [
+    {
+     "id": "7925_6390_000003",
+     "url": "https://archive.org/download/antologia_brasileira_v1_1708_librivox/antologiabrasileira1_45_various_64kb.mp3",
+     "start": 189.13,
+     "end": 202.18
+    },
+    {
+     "id": "7925_6390_000004",
+     "url": "https://archive.org/download/antologia_brasileira_v1_1708_librivox/antologiabrasileira1_20_various_64kb.mp3",
+     "start": 245.82,
+     "end": 262.38
+    },
+    {
+     "id": "7925_6390_000005",
+     "url": "https://archive.org/download/antologia_brasileira_v1_1708_librivox/antologiabrasileira1_45_various_64kb.mp3",
+     "start": 202.18,
+     "end": 217.17
+    }
+   ]
+  },
+  {
+   "name": "Voz 05",
+   "mls_speaker": "4067",
+   "enroll": [
+    {
+     "id": "4067_3313_000003",
+     "url": "https://archive.org/download/os_lusiadas_0908_librivox/lusiadas_09_camoes_64kb.mp3",
+     "start": 502.62,
+     "end": 521.94
+    },
+    {
+     "id": "4067_3313_000006",
+     "url": "https://archive.org/download/os_lusiadas_0908_librivox/lusiadas_03_camoes_64kb.mp3",
+     "start": 2418.6,
+     "end": 2438.58
+    },
+    {
+     "id": "4067_3313_000007",
+     "url": "https://archive.org/download/os_lusiadas_0908_librivox/lusiadas_03_camoes_64kb.mp3",
+     "start": 658.01,
+     "end": 671.23
+    }
+   ],
+   "meeting": [
+    {
+     "id": "4067_3313_000009",
+     "url": "https://archive.org/download/os_lusiadas_0908_librivox/lusiadas_03_camoes_64kb.mp3",
+     "start": 1816.15,
+     "end": 1835.14
+    },
+    {
+     "id": "4067_3313_000014",
+     "url": "https://archive.org/download/os_lusiadas_0908_librivox/lusiadas_09_camoes_64kb.mp3",
+     "start": 1669.63,
+     "end": 1689.63
+    },
+    {
+     "id": "4067_3313_000015",
+     "url": "https://archive.org/download/os_lusiadas_0908_librivox/lusiadas_09_camoes_64kb.mp3",
+     "start": 1849.63,
+     "end": 1869.63
+    }
+   ]
+  },
+  {
+   "name": "Voz 06",
+   "mls_speaker": "11995",
+   "enroll": [
+    {
+     "id": "11995_10229_000000",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_05_aranha_64kb.mp3",
+     "start": 464.92,
+     "end": 481.11
+    },
+    {
+     "id": "11995_10229_000001",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_05_aranha_64kb.mp3",
+     "start": 159.79,
+     "end": 174.38
+    },
+    {
+     "id": "11995_10229_000002",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_05_aranha_64kb.mp3",
+     "start": 345.98,
+     "end": 359.74
+    }
+   ],
+   "meeting": [
+    {
+     "id": "11995_10229_000003",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_05_aranha_64kb.mp3",
+     "start": 328.61,
+     "end": 345.98
+    },
+    {
+     "id": "11995_10229_000004",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_05_aranha_64kb.mp3",
+     "start": 243.83,
+     "end": 257.67
+    },
+    {
+     "id": "11995_10229_000005",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_05_aranha_64kb.mp3",
+     "start": 226.68,
+     "end": 243.83
+    }
+   ]
+  },
+  {
+   "name": "Voz 07",
+   "mls_speaker": "12626",
+   "enroll": [
+    {
+     "id": "12626_10229_000000",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_08_aranha_64kb.mp3",
+     "start": 1198.18,
+     "end": 1213.67
+    },
+    {
+     "id": "12626_10229_000001",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_08_aranha_64kb.mp3",
+     "start": 1437.11,
+     "end": 1451.46
+    },
+    {
+     "id": "12626_10229_000002",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_08_aranha_64kb.mp3",
+     "start": 231.73,
+     "end": 245.97
+    }
+   ],
+   "meeting": [
+    {
+     "id": "12626_10229_000003",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_08_aranha_64kb.mp3",
+     "start": 1121.59,
+     "end": 1136.23
+    },
+    {
+     "id": "12626_10229_000004",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_14_aranha_64kb.mp3",
+     "start": 268.22,
+     "end": 288.22
+    },
+    {
+     "id": "12626_10229_000005",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_14_aranha_64kb.mp3",
+     "start": 728.22,
+     "end": 748.22
+    }
+   ]
+  },
+  {
+   "name": "Voz 08",
+   "mls_speaker": "12287",
+   "enroll": [
+    {
+     "id": "12287_12742_000001",
+     "url": "https://archive.org/download/cartas_de_inglaterra_1805_librivox/cartasdeinglaterra_08_queiros_64kb.mp3",
+     "start": 281.44,
+     "end": 295.16
+    },
+    {
+     "id": "12287_12742_000002",
+     "url": "https://archive.org/download/cartas_de_inglaterra_1805_librivox/cartasdeinglaterra_08_queiros_64kb.mp3",
+     "start": 1093.67,
+     "end": 1113.1
+    },
+    {
+     "id": "12287_12742_000003",
+     "url": "https://archive.org/download/cartas_de_inglaterra_1805_librivox/cartasdeinglaterra_08_queiros_64kb.mp3",
+     "start": 430.66,
+     "end": 446.17
+    }
+   ],
+   "meeting": [
+    {
+     "id": "12287_12742_000004",
+     "url": "https://archive.org/download/cartas_de_inglaterra_1805_librivox/cartasdeinglaterra_08_queiros_64kb.mp3",
+     "start": 1008.89,
+     "end": 1021.95
+    },
+    {
+     "id": "12287_12742_000005",
+     "url": "https://archive.org/download/cartas_de_inglaterra_1805_librivox/cartasdeinglaterra_08_queiros_64kb.mp3",
+     "start": 655.64,
+     "end": 673.73
+    },
+    {
+     "id": "12287_12742_000006",
+     "url": "https://archive.org/download/cartas_de_inglaterra_1805_librivox/cartasdeinglaterra_08_queiros_64kb.mp3",
+     "start": 636.01,
+     "end": 655.64
+    }
+   ]
+  },
+  {
+   "name": "Voz 09",
+   "mls_speaker": "13063",
+   "enroll": [
+    {
+     "id": "13063_13511_000000",
+     "url": "https://archive.org/download/contos_phantasticos_1904_librivox/contosphantasticos_04_braga_64kb.mp3",
+     "start": 1428.71,
+     "end": 1445.22
+    },
+    {
+     "id": "13063_13511_000001",
+     "url": "https://archive.org/download/contos_phantasticos_1904_librivox/contosphantasticos_04_braga_64kb.mp3",
+     "start": 1097.14,
+     "end": 1111.65
+    },
+    {
+     "id": "13063_13511_000002",
+     "url": "https://archive.org/download/contos_phantasticos_1904_librivox/contosphantasticos_04_braga_64kb.mp3",
+     "start": 294.29,
+     "end": 313.77
+    }
+   ],
+   "meeting": [
+    {
+     "id": "13063_13511_000003",
+     "url": "https://archive.org/download/contos_phantasticos_1904_librivox/contosphantasticos_04_braga_64kb.mp3",
+     "start": 237.09,
+     "end": 251.86
+    },
+    {
+     "id": "13063_13511_000004",
+     "url": "https://archive.org/download/contos_phantasticos_1904_librivox/contosphantasticos_04_braga_64kb.mp3",
+     "start": 251.86,
+     "end": 265.2
+    },
+    {
+     "id": "13063_13511_000005",
+     "url": "https://archive.org/download/contos_phantasticos_1904_librivox/contosphantasticos_04_braga_64kb.mp3",
+     "start": 531.64,
+     "end": 551.29
+    }
+   ]
+  },
+  {
+   "name": "Voz 10",
+   "mls_speaker": "12707",
+   "enroll": [
+    {
+     "id": "12707_10229_000000",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_02_aranha_64kb.mp3",
+     "start": 711.91,
+     "end": 731.91
+    },
+    {
+     "id": "12707_10229_000001",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_02_aranha_64kb.mp3",
+     "start": 2291.91,
+     "end": 2311.91
+    },
+    {
+     "id": "12707_10229_000002",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_02_aranha_64kb.mp3",
+     "start": 2131.91,
+     "end": 2151.91
+    }
+   ],
+   "meeting": [
+    {
+     "id": "12707_10229_000003",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_02_aranha_64kb.mp3",
+     "start": 571.91,
+     "end": 591.91
+    },
+    {
+     "id": "12707_10229_000004",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_02_aranha_64kb.mp3",
+     "start": 1691.91,
+     "end": 1711.91
+    },
+    {
+     "id": "12707_10229_000005",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_02_aranha_64kb.mp3",
+     "start": 871.91,
+     "end": 891.91
+    }
+   ]
+  },
+  {
+   "name": "Voz 11",
+   "mls_speaker": "5739",
+   "enroll": [
+    {
+     "id": "5739_4739_000001",
+     "url": "https://archive.org/download/contos_fluminenses_1202_librivox/contosfluminenses_06_assis_64kb.mp3",
+     "start": 70.43,
+     "end": 83.3
+    },
+    {
+     "id": "5739_4739_000002",
+     "url": "https://archive.org/download/contos_fluminenses_1202_librivox/contosfluminenses_06_assis_64kb.mp3",
+     "start": 3794.21,
+     "end": 3807.65
+    },
+    {
+     "id": "5739_4739_000003",
+     "url": "https://archive.org/download/contos_fluminenses_1202_librivox/contosfluminenses_06_assis_64kb.mp3",
+     "start": 2103.49,
+     "end": 2118.17
+    }
+   ],
+   "meeting": [
+    {
+     "id": "5739_4739_000004",
+     "url": "https://archive.org/download/contos_fluminenses_1202_librivox/contosfluminenses_06_assis_64kb.mp3",
+     "start": 3836.16,
+     "end": 3849.14
+    },
+    {
+     "id": "5739_4739_000005",
+     "url": "https://archive.org/download/contos_fluminenses_1202_librivox/contosfluminenses_06_assis_64kb.mp3",
+     "start": 187.41,
+     "end": 203.98
+    },
+    {
+     "id": "5739_4739_000006",
+     "url": "https://archive.org/download/contos_fluminenses_1202_librivox/contosfluminenses_06_assis_64kb.mp3",
+     "start": 1329.61,
+     "end": 1342.34
+    }
+   ]
+  },
+  {
+   "name": "Voz 12",
+   "mls_speaker": "12710",
+   "enroll": [
+    {
+     "id": "12710_10229_000000",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_13_aranha_64kb.mp3",
+     "start": 838.26,
+     "end": 851.1
+    },
+    {
+     "id": "12710_10229_000002",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_13_aranha_64kb.mp3",
+     "start": 793.51,
+     "end": 809.67
+    },
+    {
+     "id": "12710_10229_000003",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_13_aranha_64kb.mp3",
+     "start": 486.59,
+     "end": 499.17
+    }
+   ],
+   "meeting": [
+    {
+     "id": "12710_10229_000004",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_13_aranha_64kb.mp3",
+     "start": 598.63,
+     "end": 613.48
+    },
+    {
+     "id": "12710_10229_000005",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_13_aranha_64kb.mp3",
+     "start": 704.14,
+     "end": 723.38
+    },
+    {
+     "id": "12710_10229_000006",
+     "url": "https://archive.org/download/canaa_1901_librivox/canaa_13_aranha_64kb.mp3",
+     "start": 183.48,
+     "end": 196.49
+    }
+   ]
+  }
+ ]
+}

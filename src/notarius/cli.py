@@ -7,6 +7,7 @@ available here.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import shutil
 import sys
@@ -48,6 +49,13 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"notarius {__version__}")
     parser.add_argument("-v", "--verbose", action="store_true", help="debug logging")
     sub = parser.add_subparsers(dest="command")
+
+    p = sub.add_parser("app", help="open the app in the browser (default)")
+    p.add_argument("--port", type=int, default=None)
+    p.add_argument("--no-browser", action="store_true")
+
+    p = sub.add_parser("setup", help="download models and measure this computer")
+    p.add_argument("--no-speed-test", action="store_true")
 
     p = sub.add_parser("transcribe", help="transcribe a recording or a Zoom folder")
     p.add_argument("source", type=Path, help="audio/video file or Zoom recording folder")
@@ -106,24 +114,9 @@ def _device(args: argparse.Namespace) -> str:
 
 
 def _run_settings(args: argparse.Namespace):
-    from notarius.pipeline import RunSettings
-    from notarius.tuning import load_tuning
+    from notarius.settings import run_settings
 
-    tuned = load_tuning()
-    device = args.device or (tuned.device if tuned else _device(args))
-    on_cpu = device == "cpu"
-    settings = RunSettings(
-        device=device,
-        compute_type=args.compute_type or (
-            tuned.compute_type if tuned and tuned.device == device
-            else CPU_COMPUTE_TYPE if on_cpu else GPU_COMPUTE_TYPE
-        ),
-        batch_size=args.batch_size if args.batch_size is not None else (
-            tuned.batch_size if tuned and tuned.device == device
-            else CPU_BATCH_SIZE if on_cpu else GPU_BATCH_SIZE
-        ),
-        whisper_model=args.model or (tuned.whisper_model if tuned else WHISPER_MODEL),
-    )
+    settings = run_settings(args.device, args.compute_type, args.batch_size, args.model)
     if args.out_dir:
         settings.meetings_dir = args.out_dir
     return settings
@@ -227,7 +220,23 @@ def _cmd_aliases(args: argparse.Namespace) -> None:
         print(f"  {person} <- {', '.join(names)}", file=sys.stderr)
 
 
+def _cmd_app(args: argparse.Namespace) -> None:
+    from notarius.server import DEFAULT_PORT, serve
+
+    serve(args.port or DEFAULT_PORT, open_browser=not args.no_browser)
+
+
+def _cmd_setup(args: argparse.Namespace) -> None:
+    from notarius.setup import run_setup
+
+    result = run_setup(lambda stage, msg: print(msg, file=sys.stderr),
+                       speed_test=not args.no_speed_test)
+    print(json.dumps(result), file=sys.stderr)
+
+
 _COMMANDS = {
+    "app": _cmd_app,
+    "setup": _cmd_setup,
     "transcribe": _cmd_transcribe,
     "enroll": _cmd_enroll,
     "enroll-whatsapp": _cmd_enroll_whatsapp,
@@ -235,7 +244,7 @@ _COMMANDS = {
     "profiles": _cmd_profiles,
     "aliases": _cmd_aliases,
 }
-_NEEDS_FFMPEG = {"transcribe", "enroll", "enroll-whatsapp", "enroll-meeting"}
+_NEEDS_FFMPEG = {"app", "setup", "transcribe", "enroll", "enroll-whatsapp", "enroll-meeting"}
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -243,8 +252,11 @@ def main(argv: list[str] | None = None) -> None:
     # names for any program reading it as UTF-8.
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", errors="replace")
+    from notarius import env
+
+    env.configure()
     parser = _build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args(argv if argv is not None else (sys.argv[1:] or ["app"]))
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s %(name)s %(levelname)s: %(message)s",

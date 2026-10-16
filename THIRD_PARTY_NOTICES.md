@@ -22,6 +22,9 @@ incluído.
   WeSpeaker: https://github.com/wenet-e2e/wespeaker
 - **Whisper large-v3** (OpenAI, MIT licence), CTranslate2 conversion by
   SYSTRAN (`Systran/faster-whisper-large-v3`, MIT licence).
+- **Whisper large-v3-turbo** (OpenAI, MIT licence), CTranslate2 conversion
+  `dropbox-dash/faster-whisper-large-v3-turbo` (MIT licence) — used on
+  computers with little memory.
 - **jonatasgrosman/wav2vec2-large-xlsr-53-portuguese** — Jonatas
   Grosman, Apache 2.0 licence.
 

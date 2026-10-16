@@ -224,9 +224,11 @@ def transcribe_per_participant(
             for seg in aligned["segments"]:
                 text = seg.get("text", "").strip()
                 if text:
+                    # The label is the track key, so the segment's audio is
+                    # found even after the user renames the speaker.
                     out.append(IdentifiedSegment(
                         float(seg["start"]), float(seg["end"]), text, name, 1.0,
-                        label="", origin="track",
+                        label=name, origin="track",
                     ))
         del align_model, align_metadata
         _free_memory()

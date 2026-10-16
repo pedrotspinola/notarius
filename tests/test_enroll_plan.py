@@ -5,9 +5,10 @@ from notarius.enroll import MIN_TOTAL, plan_enrollment
 from notarius.meeting import Meeting
 
 
-def long_turns(name, start, n, each=10.0, gap=20.0):
+def long_turns(name, start, n, each=10.0, gap=20.0, label=""):
     """*n* turns of *each* seconds, *gap* apart, overlapping nobody."""
-    return [IdentifiedSegment(start + i * gap, start + i * gap + each, "fala", name, 5.0)
+    return [IdentifiedSegment(start + i * gap, start + i * gap + each, "fala", name, 5.0,
+                              label=label)
             for i in range(n)]
 
 
@@ -62,8 +63,10 @@ def test_variant_only_when_recognition_was_weak(tmp_path):
 
 def test_zoom_track_uses_own_file_and_skips_enrolled(tmp_path):
     (tmp_path / "Vicente.npy").write_bytes(b"")
-    segs = long_turns("Odete", 0, 6) + long_turns("Vicente", 5000, 6)
-    m = meeting(segs, tracks={"Odete": "/z/odete.m4a", "Vicente": "/z/vicente.m4a"})
+    # Odete's track was named after her phone; she was renamed in review.
+    segs = long_turns("Odete", 0, 6, label="Xiaomi") + long_turns("Vicente", 5000, 6, label="Vicente")
+    m = meeting(segs, tracks={"Xiaomi": "/z/odete.m4a", "Vicente": "/z/vicente.m4a"})
     plans = plans_by_person(m, tmp_path)
-    assert (plans["Odete"].action, plans["Odete"].audio_path) == ("enroll", "/z/odete.m4a")
+    assert plans["Odete"].action == "enroll"
+    assert {c.audio for c in plans["Odete"].clips} == {"/z/odete.m4a"}
     assert plans["Vicente"].code == "already_enrolled"

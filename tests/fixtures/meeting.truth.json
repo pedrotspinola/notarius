@@ -1,0 +1,105 @@
+{
+ "enrolled": [
+  "Voz 01",
+  "Voz 02",
+  "Voz 03",
+  "Voz 04",
+  "Voz 05",
+  "Voz 06",
+  "Voz 07",
+  "Voz 08",
+  "Voz 09",
+  "Voz 10",
+  "Voz 11"
+ ],
+ "unenrolled": [
+  "Voz 12"
+ ],
+ "turns": [
+  {
+   "speaker": "Voz 01",
+   "start": 0.0,
+   "end": 20.0
+  },
+  {
+   "speaker": "Voz 02",
+   "start": 20.6,
+   "end": 38.14
+  },
+  {
+   "speaker": "Voz 12",
+   "start": 38.74,
+   "end": 53.59
+  },
+  {
+   "speaker": "Voz 03",
+   "start": 54.19,
+   "end": 73.17
+  },
+  {
+   "speaker": "Voz 04",
+   "start": 73.77,
+   "end": 86.82
+  },
+  {
+   "speaker": "Voz 12",
+   "start": 87.42,
+   "end": 106.66
+  },
+  {
+   "speaker": "Voz 01",
+   "start": 107.26,
+   "end": 126.65
+  },
+  {
+   "speaker": "Voz 03",
+   "start": 127.25,
+   "end": 144.56
+  },
+  {
+   "speaker": "Voz 12",
+   "start": 145.16,
+   "end": 158.17
+  },
+  {
+   "speaker": "Voz 02",
+   "start": 158.77,
+   "end": 178.46
+  },
+  {
+   "speaker": "Voz 04",
+   "start": 179.06,
+   "end": 195.62
+  },
+  {
+   "speaker": "Voz 12",
+   "start": 196.22,
+   "end": 209.06
+  },
+  {
+   "speaker": "Voz 02",
+   "start": 209.66,
+   "end": 225.81
+  },
+  {
+   "speaker": "Voz 01",
+   "start": 226.41,
+   "end": 246.41
+  },
+  {
+   "speaker": "Voz 12",
+   "start": 247.01,
+   "end": 263.17
+  },
+  {
+   "speaker": "Voz 04",
+   "start": 263.77,
+   "end": 278.76
+  },
+  {
+   "speaker": "Voz 03",
+   "start": 279.36,
+   "end": 295.83
+  }
+ ]
+}

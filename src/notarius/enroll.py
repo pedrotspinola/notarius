@@ -56,6 +56,7 @@ _SAMPLE_RATE = 16000
 class Clip:
     start: float
     end: float
+    audio: str  # file to cut from: the person's own track, or the recording
 
 
 @dataclass
@@ -65,7 +66,6 @@ class PersonPlan:
     reason: str  # short English reason code text; the UI translates codes
     code: str  # machine-readable reason
     target_profile: str = ""
-    audio_path: str = ""
     clips: list[Clip] = field(default_factory=list)
     clean_seconds: float = 0.0
     best_raw: float | None = None  # how well existing profiles matched here
@@ -88,7 +88,11 @@ class EnrollOutcome:
 
 
 def _clean_clips(meeting: Meeting, person: str) -> list[Clip]:
-    """Segments of *person* that overlap no other speaker, longest first."""
+    """Segments of *person* that overlap no other speaker, longest first.
+
+    A segment from a per-participant track is cut from that track (its
+    label names the track), so renaming a speaker in review keeps working.
+    """
     own = [s for s in meeting.segments if s.speaker_name == person]
     others = [s for s in meeting.segments if s.speaker_name != person]
     clips: list[Clip] = []
@@ -97,7 +101,8 @@ def _clean_clips(meeting: Meeting, person: str) -> list[Clip]:
             continue
         if any(o.start < s.end and s.start < o.end for o in others):
             continue
-        clips.append(Clip(s.start, min(s.end, s.start + MAX_CLIP)))
+        audio = meeting.tracks.get(s.label, meeting.source_path)
+        clips.append(Clip(s.start, min(s.end, s.start + MAX_CLIP), audio))
     clips.sort(key=lambda c: c.end - c.start, reverse=True)
     return clips
 
@@ -128,8 +133,7 @@ def plan_enrollment(
     for person in people:
         clips = _clean_clips(meeting, person)
         clean = sum(c.end - c.start for c in clips)
-        audio = meeting.tracks.get(person, meeting.source_path)
-        plan = PersonPlan(person, "skip", "", "", audio_path=audio, clean_seconds=clean)
+        plan = PersonPlan(person, "skip", "", "", clean_seconds=clean)
         plans.append(plan)
         try:
             validate_base_name(person)
@@ -143,8 +147,9 @@ def plan_enrollment(
             if len(has_profiles) >= MAX_PROFILES_PER_PERSON:
                 plan.code, plan.reason = "too_many", "person already has the maximum number of profiles"
                 continue
-            if person in meeting.tracks:
-                # One-person track: no recognition happened, so there is no
+            own_labels = {s.label for s in meeting.segments if s.speaker_name == person}
+            if own_labels and own_labels <= set(meeting.tracks):
+                # One-person tracks: no recognition happened, so there is no
                 # score to judge by; enroll only people without profiles.
                 plan.code, plan.reason = "already_enrolled", "already has a voice profile"
                 continue
@@ -213,11 +218,11 @@ def execute(
         for plan in todo:
             if progress:
                 progress(plan.person)
-            if plan.audio_path not in audio_cache:
-                audio_cache[plan.audio_path] = whisperx.load_audio(plan.audio_path)
-            audio = audio_cache[plan.audio_path]
             embeddings = []
             for clip in plan.clips:
+                if clip.audio not in audio_cache:
+                    audio_cache[clip.audio] = whisperx.load_audio(clip.audio)
+                audio = audio_cache[clip.audio]
                 s = int(clip.start * _SAMPLE_RATE)
                 e = min(int(clip.end * _SAMPLE_RATE), len(audio))
                 if e - s < _SAMPLE_RATE:

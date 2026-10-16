@@ -403,13 +403,25 @@ def identify_speakers(
     space = build_space(load_all_profiles(config.profiles_dir), config)
 
     if space is None:
+        # Nobody enrolled yet (a new user's first meetings): every speaker
+        # is unknown, but each label is still reported, so review can ask
+        # who they are.
         log.info("No voice profiles enrolled; every speaker is unknown")
         names = unknown_names(unique_labels)
+        stats: dict[str, list[float]] = {}
+        for s in segments:
+            n, dur = stats.setdefault(s.speaker_label, [0, 0.0])
+            stats[s.speaker_label] = [n + 1, dur + max(0.0, s.end - s.start)]
+        matches = [
+            LabelMatch(label, None, [], int(stats[label][0]), stats[label][1],
+                       used_asnorm=False, display=names[label])
+            for label in unique_labels
+        ]
         return [
             IdentifiedSegment(s.start, s.end, s.text, names[s.speaker_label], -1.0,
                               label=s.speaker_label)
             for s in segments
-        ], []
+        ], matches
 
     verify_on = config.verify_segments and space.use_asnorm
     sr = _SAMPLE_RATE

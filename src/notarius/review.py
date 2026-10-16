@@ -135,8 +135,21 @@ def build_review(
     silent_listed = [n for n in meeting.listed_attendees if n not in present]
     listed = {n.lower() for n in meeting.listed_attendees}
 
+    # Every diarization label still carrying an unknown name must be asked
+    # about, even if the record has no diagnostics for it.
+    labels = list(meeting.labels)
+    known_labels = {lab["label"] for lab in labels}
+    for label, indices in by_label.items():
+        if label and label not in known_labels and label not in meeting.tracks and any(
+            meeting.segments[i].origin == "label"
+            and meeting.segments[i].speaker_name.startswith(UNKNOWN_PREFIX)
+            for i in indices
+        ):
+            labels.append({"label": label, "matched": False, "candidates": [],
+                           "scoring": "raw"})
+
     items: list[ReviewItem] = []
-    for lab in meeting.labels:
+    for lab in labels:
         label = lab["label"]
         # Segments still carrying the label's automatic name.
         indices = [i for i in by_label.get(label, [])

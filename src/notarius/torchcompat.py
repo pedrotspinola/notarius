@@ -6,17 +6,24 @@ those trusted checkpoints load, both ``torch.load`` and
 ``torch.serialization.load`` (pyannote may reference either) are swapped for
 versions that force ``weights_only=False`` — even when the caller passes
 ``None`` explicitly, as lightning does.
+
+The context manager nests: loading the voice model inside a stage that is
+already patched must not restore the originals when the inner block ends,
+or the rest of the outer stage loads unprotected.
 """
 
 from __future__ import annotations
 
 import contextlib
+import threading
 from collections.abc import Iterator
 
 import torch
 
 _original_torch_load = torch.load
 _original_serial_load = torch.serialization.load
+_lock = threading.Lock()
+_depth = 0
 
 
 def _make_patched(original):
@@ -31,10 +38,17 @@ def _make_patched(original):
 @contextlib.contextmanager
 def trusted_checkpoints() -> Iterator[None]:
     """Allow full unpickling of checkpoints inside the ``with`` block."""
-    torch.load = _make_patched(_original_torch_load)
-    torch.serialization.load = _make_patched(_original_serial_load)
+    global _depth
+    with _lock:
+        if _depth == 0:
+            torch.load = _make_patched(_original_torch_load)
+            torch.serialization.load = _make_patched(_original_serial_load)
+        _depth += 1
     try:
         yield
     finally:
-        torch.load = _original_torch_load
-        torch.serialization.load = _original_serial_load
+        with _lock:
+            _depth -= 1
+            if _depth == 0:
+                torch.load = _original_torch_load
+                torch.serialization.load = _original_serial_load

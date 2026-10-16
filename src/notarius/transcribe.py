@@ -167,20 +167,53 @@ def transcribe(
     return segments
 
 
-# A run of words this short, credited to another speaker in the middle of a
-# segment, is more likely one misassigned word than a real reply.
-MIN_RUN_WORDS = 3
-MIN_RUN_SECONDS = 1.0
+# Word-level speakers are noisy at the edges of turns on real calls, so a
+# split is only made where it looks like a real change of speaker.  Rule
+# chosen on four hand-corrected meetings (about six hours): Whisper
+# segments rarely cross a change of speaker (4 times), and a looser rule
+# made 186 splits, mostly an edge word or half a sentence moved to the
+# neighbour.  This rule made 8, of which 4 were clearly right, 1 partly and
+# 3 not settled by the transcripts, and it still splits the case that
+# prompted it (one segment across two people's turns).
+MIN_RUN_WORDS = 3      # a run shorter than this, or than MIN_RUN_SECONDS,
+MIN_RUN_SECONDS = 1.0  # folds into its larger neighbour
+MIN_PAUSE = 0.5        # without sentence-final punctuation, a change of
+SENTENCE_END = (".", "?", "!", "…")  # speaker needs a pause this long
+
+
+def _seconds(words: list[dict]) -> float:
+    starts = [w["start"] for w in words if "start" in w]
+    ends = [w["end"] for w in words if "end" in w]
+    return (max(ends) - min(starts)) if starts and ends else 0.0
+
+
+def _coalesce(runs: list[list]) -> list[list]:
+    out: list[list] = []
+    for run in runs:
+        if out and out[-1][0] == run[0]:
+            out[-1][1].extend(run[1])
+        else:
+            out.append(run)
+    return out
+
+
+def _plausible_change(before: list[dict], after: list[dict]) -> bool:
+    if before[-1]["word"].strip().endswith(SENTENCE_END):
+        return True
+    end = next((w["end"] for w in reversed(before) if "end" in w), None)
+    start = next((w["start"] for w in after if "start" in w), None)
+    return end is not None and start is not None and start - end >= MIN_PAUSE
 
 
 def split_at_speaker_changes(raw_segments: list[dict]) -> list[TranscriptionSegment]:
     """Turn WhisperX segments into one segment per speaker run.
 
-    Whisper often makes one segment across a change of speaker (a quick
-    reply right after someone finishes).  The segment's own speaker is
-    whoever spoke most of it, so the other person's words would be credited
-    to them.  Every word carries its own speaker, so segments are split
-    where the speaker changes; very short runs merge into their neighbour.
+    Whisper sometimes makes one segment across a change of speaker, and the
+    segment's speaker is whoever spoke most of it.  Every word carries its
+    own speaker, so a segment is split where the speaker changes — but only
+    where that change is believable: both sides long enough, and a sentence
+    end or a pause between them.  Otherwise the pieces merge back and the
+    longer one's speaker wins, which is the old whole-segment behaviour.
     """
     out: list[TranscriptionSegment] = []
     for seg in raw_segments:
@@ -203,35 +236,30 @@ def split_at_speaker_changes(raw_segments: list[dict]) -> list[TranscriptionSegm
             else:
                 runs.append([speaker, [w]])
 
-        def seconds(ws: list[dict]) -> float:
-            starts = [w["start"] for w in ws if "start" in w]
-            ends = [w["end"] for w in ws if "end" in w]
-            return (max(ends) - min(starts)) if starts and ends else 0.0
-
-        def short(ws: list[dict]) -> bool:
-            return len(ws) < MIN_RUN_WORDS and seconds(ws) < MIN_RUN_SECONDS
-
-        # Repeatedly fold the shortest run into its larger neighbour while
-        # it is too short to be a real reply, so a single misassigned word
-        # always loses to the speaker around it.
-        while len(runs) > 1:
-            i = min(range(len(runs)), key=lambda k: (len(runs[k][1]), seconds(runs[k][1])))
-            if not short(runs[i][1]):
-                break
-            neighbours = [j for j in (i - 1, i + 1) if 0 <= j < len(runs)]
-            j = max(neighbours, key=lambda k: (len(runs[k][1]), k < i))
-            if j < i:
-                runs[j][1].extend(runs[i][1])
-            else:
-                runs[j][1][:0] = runs[i][1]
-            del runs[i]
-            coalesced: list[list] = []
-            for run in runs:
-                if coalesced and coalesced[-1][0] == run[0]:
-                    coalesced[-1][1].extend(run[1])
+        changed = True
+        while changed and len(runs) > 1:
+            changed = False
+            i = min(range(len(runs)), key=lambda k: (len(runs[k][1]), _seconds(runs[k][1])))
+            ws = runs[i][1]
+            if len(ws) < MIN_RUN_WORDS or _seconds(ws) < MIN_RUN_SECONDS:
+                neighbours = [j for j in (i - 1, i + 1) if 0 <= j < len(runs)]
+                j = max(neighbours, key=lambda k: (len(runs[k][1]), k < i))
+                if j < i:
+                    runs[j][1].extend(ws)
                 else:
-                    coalesced.append(run)
-            runs = coalesced
+                    runs[j][1][:0] = ws
+                del runs[i]
+                runs = _coalesce(runs)
+                changed = True
+                continue
+            for k in range(len(runs) - 1):
+                if not _plausible_change(runs[k][1], runs[k + 1][1]):
+                    a, b = runs[k], runs[k + 1]
+                    keep = a[0] if _seconds(a[1]) >= _seconds(b[1]) else b[0]
+                    runs[k:k + 2] = [[keep, a[1] + b[1]]]
+                    runs = _coalesce(runs)
+                    changed = True
+                    break
 
         for speaker, ws in runs:
             starts = [w["start"] for w in ws if "start" in w]

@@ -59,3 +59,34 @@ def test_segments_without_words_are_kept_whole():
     out = split_at_speaker_changes([{"start": 5.0, "end": 6.0, "text": " oi ", "speaker": "C"},
                                     {"start": 7.0, "end": 8.0, "text": "  "}])
     assert labels(out) == [("C", "oi", 5.0, 6.0)]
+
+
+# --- Mistakes seen on real calls (checked against hand-corrected transcripts)
+
+def test_a_sentence_is_not_cut_in_the_middle():
+    # "…a gente fez dois | pareceres só sobre…": one person, noisy labels.
+    out = split_at_speaker_changes([seg([
+        w("só", 0.0, 0.2, "A"), w("estou", 0.3, 0.5, "A"), w("dizendo", 0.6, 1.0, "A"),
+        w("que", 1.1, 1.2, "A"), w("fez", 1.3, 1.5, "A"), w("dois", 1.6, 1.9, "A"),
+        w("pareceres", 2.0, 2.6, "B"), w("sobre", 2.7, 2.9, "B"), w("prestação", 3.0, 3.5, "B"),
+    ])])
+    assert labels(out) == [("A", "só estou dizendo que fez dois pareceres sobre prestação", 0.0, 3.5)]
+
+
+def test_one_long_edge_word_is_not_a_speaker():
+    # "Eu | vou travar meu som": the single word lasted over a second.
+    out = split_at_speaker_changes([seg([
+        w("Eu", 0.0, 1.3, "B"), w("vou", 1.4, 1.6, "A"), w("travar", 1.7, 2.1, "A"),
+        w("meu", 2.2, 2.3, "A"), w("som", 2.4, 2.8, "A"),
+    ])])
+    assert labels(out) == [("A", "Eu vou travar meu som", 0.0, 2.8)]
+
+
+def test_a_sentence_end_lets_the_next_speaker_take_over():
+    # "…aprendendo… | Está dando para ouvir agora?": two people, no pause.
+    out = split_at_speaker_changes([seg([
+        w("Eu", 0.0, 0.2, "A"), w("estou", 0.3, 0.6, "A"), w("aprendendo...", 0.7, 1.4, "A"),
+        w("Está", 1.5, 1.7, "B"), w("dando", 1.8, 2.0, "B"), w("para", 2.1, 2.2, "B"),
+        w("ouvir", 2.3, 2.6, "B"), w("agora?", 2.7, 3.1, "B"),
+    ])])
+    assert [s.speaker_label for s in out] == ["A", "B"]

@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Never commit meetings, voices or recordings
+*.wav
+*.mp3
+*.m4a
+*.mkv
+*.mp4
+*.npy
+*.npz
+Notarius/
+Transcrições/
+Vozes/
+
+# Except the test recordings
+!tests/fixtures/**/*.opus

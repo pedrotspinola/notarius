@@ -1,0 +1,31 @@
+[project]
+name = "notarius"
+version = "0.1.0"
+description = "Meeting transcription with speaker identification, for Windows"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "whisperx>=3.3.0",
+    # pyannote 4.x needs several times more memory for the same audio.
+    "pyannote-audio>=3.3,<4.0",
+    "torch>=2.0",
+    "numpy>=1.26",
+]
+
+[project.scripts]
+notarius = "notarius.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/notarius"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

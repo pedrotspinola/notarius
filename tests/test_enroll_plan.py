@@ -81,3 +81,21 @@ def test_long_turns_are_cut_into_several_clips(tmp_path):
     # Every turn contributes before any turn contributes twice.
     starts = sorted(c.start for c in p.clips)
     assert {0.0, 40.0, 80.0} <= set(starts)
+
+
+def test_a_meeting_is_not_learned_twice(tmp_path):
+    m = meeting(long_turns("Odete", 0, 6))
+    m.learned = ["Odete"]
+    p = plans_by_person(m, tmp_path)["Odete"]
+    assert (p.action, p.code) == ("skip", "learned_here")
+
+
+def test_record_learned_round_trip(tmp_path):
+    from notarius.enroll import EnrollOutcome, PersonPlan, record_learned
+
+    path = tmp_path / "m.json"
+    meeting(long_turns("Odete", 0, 6)).save(path)
+    done = EnrollOutcome(PersonPlan("Odete", "enroll", "", "new_person"), tmp_path / "Odete.npy")
+    failed = EnrollOutcome(PersonPlan("Vicente", "enroll", "", "new_person"), None, "x")
+    record_learned(path, [done, failed])
+    assert Meeting.load(path).learned == ["Odete"]

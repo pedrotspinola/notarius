@@ -151,6 +151,9 @@ def plan_enrollment(
             plan.code, plan.reason = "invalid_name", "name cannot be used as a file name"
             continue
 
+        if person in meeting.learned:
+            plan.code, plan.reason = "learned_here", "already learned from this meeting"
+            continue
         has_profiles = existing.get(person, [])
         plan.best_raw = _best_raw_in_meeting(meeting, person)
         if has_profiles:
@@ -207,6 +210,15 @@ def _drop_outliers(embeddings: list[np.ndarray]) -> tuple[list[np.ndarray], int]
                 changed = True
                 break
     return kept, dropped
+
+
+def record_learned(meeting_path: Path, outcomes: list[EnrollOutcome]) -> None:
+    """Remember who was learned from a meeting, so it is not done twice."""
+    meeting = Meeting.load(meeting_path)
+    for o in outcomes:
+        if o.profile_path is not None and o.plan.person not in meeting.learned:
+            meeting.learned.append(o.plan.person)
+    meeting.save(meeting_path)
 
 
 def execute(

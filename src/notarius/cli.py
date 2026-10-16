@@ -177,13 +177,17 @@ def _cmd_enroll_meeting(args: argparse.Namespace) -> None:
     from notarius.enroll import execute, plan_enrollment
     from notarius.meeting import Meeting
 
+    from notarius.enroll import record_learned
+
     plans = plan_enrollment(Meeting.load(args.meeting), PROFILES_DIR)
     for p in plans:
         target = f" -> {p.target_profile}" if p.action == "enroll" else ""
         print(f"  {p.action.upper():6} {p.person}{target}: {p.reason}", file=sys.stderr)
     if args.dry_run or not any(p.action == "enroll" for p in plans):
         return
-    for o in execute(plans, PROFILES_DIR, _device(args)):
+    outcomes = execute(plans, PROFILES_DIR, _device(args))
+    record_learned(args.meeting, outcomes)
+    for o in outcomes:
         if o.profile_path is None:
             print(f"  FAILED {o.plan.person}: {o.reason}", file=sys.stderr)
             continue

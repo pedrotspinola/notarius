@@ -465,6 +465,7 @@ const PLAN_REASONS = {
   already_enrolled: "já tem voz cadastrada",
   too_little_speech: "falou pouco nesta reunião",
   too_many: "já tem o máximo de vozes guardadas",
+  learned_here: "já foi aprendida desta reunião",
   invalid_name: "nome não pode ser usado",
 };
 

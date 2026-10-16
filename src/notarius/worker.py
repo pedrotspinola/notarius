@@ -86,6 +86,9 @@ def _run(kind: str, params: dict, progress) -> dict:
         plans = [p for p in plan_enrollment(meeting, PROFILES_DIR) if p.person in wanted]
         outcomes = execute(plans, PROFILES_DIR, run_settings().device,
                            progress=lambda person: progress("enroll", person))
+        from notarius.enroll import record_learned
+
+        record_learned(Path(params["meeting_path"]), outcomes)
         return {"outcomes": [
             {"person": o.plan.person, "profile": o.plan.target_profile,
              "ok": o.profile_path is not None, "reason": o.reason,

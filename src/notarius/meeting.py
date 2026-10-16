@@ -103,6 +103,7 @@ class Meeting:
     chat: list[ChatMessage] = field(default_factory=list)
     settings: dict = field(default_factory=dict)
     review_status: str = "pending"  # "pending" | "done"
+    learned: list[str] = field(default_factory=list)  # voices already learned from it
     created: str = field(default_factory=lambda: datetime.now().isoformat(timespec="seconds"))
     updated: str | None = None
 
@@ -188,6 +189,7 @@ class Meeting:
             "created": self.created,
             "updated": self.updated,
             "review_status": self.review_status,
+            "learned": self.learned,
             "source": {
                 "kind": self.source_kind,
                 "path": self.source_path,
@@ -223,6 +225,7 @@ class Meeting:
             created=data["created"],
             updated=data.get("updated"),
             review_status=data.get("review_status", "pending"),
+            learned=data.get("learned") or [],
             settings=data.get("settings") or {},
             listed_attendees=data.get("listed_attendees") or [],
             labels=data.get("labels") or [],

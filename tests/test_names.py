@@ -2,7 +2,13 @@
 
 import pytest
 
-from notarius.aliases import add_alias, load_aliases, remove_alias, resolve_display_name
+from notarius.aliases import (
+    add_alias,
+    fold_name,
+    load_aliases,
+    remove_alias,
+    resolve_display_name,
+)
 from notarius.config import profile_base_name, validate_base_name
 from notarius.profiles import list_profiles, rename_person
 
@@ -19,6 +25,29 @@ def test_resolve_alias_and_canonical_case(tmp_path):
     assert remove_alias("Odete Prado", "Odete P.", path)
     assert load_aliases(path) == {}
 
+
+
+def test_resolve_ignores_accents_the_display_name_lost():
+    # Zoom display names often lose accents: a track named "Iolanda Brandao"
+    # must still reach the person whose alias is "Iolanda Brandão".
+    aliases = {"Iolanda": ["Iolanda Brandão"], "Teodoro Lima": ["Teo"]}
+    assert fold_name("  IOLANDA Brandão ") == "iolanda brandao"
+    assert resolve_display_name("Iolanda Brandao", aliases) == "Iolanda"
+    assert resolve_display_name("IOLANDA BRANDAO", aliases) == "Iolanda"
+    assert resolve_display_name("Téodoro Lima", aliases) == "Teodoro Lima"  # the person's own name
+    assert resolve_display_name("Teó", aliases) == "Teodoro Lima"
+    # Folding is not fuzzy matching: other names pass through untouched.
+    assert resolve_display_name("Iolanda", aliases) == "Iolanda"
+    assert resolve_display_name("Iolanda Brandao Neta", aliases) == "Iolanda Brandao Neta"
+
+
+def test_accent_free_match_never_picks_between_two_people():
+    aliases = {"Odete Prado": ["Odete"], "Odéte Ramos": ["Odéte"]}
+    # An exact (case-insensitive) match always wins...
+    assert resolve_display_name("odete", aliases) == "Odete Prado"
+    assert resolve_display_name("ODÉTE", aliases) == "Odéte Ramos"
+    # ...and a third spelling that folds onto both is left alone.
+    assert resolve_display_name("Odète", aliases) == "Odète"
 
 def test_profile_names():
     assert profile_base_name("Odete Prado__zoom") == "Odete Prado"

@@ -9,6 +9,7 @@ names they appear under.  Stored as JSON next to the voice profiles.
 from __future__ import annotations
 
 import json
+import unicodedata
 from pathlib import Path
 
 from notarius.config import PROFILES_DIR
@@ -28,14 +29,35 @@ def save_aliases(aliases: dict[str, list[str]], path: Path = ALIASES_FILE) -> No
     path.write_text(json.dumps(aliases, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def fold_name(name: str) -> str:
+    """Case- and accent-insensitive form of a name ("Odete Brandão" -> "odete brandao")."""
+    decomposed = unicodedata.normalize("NFKD", name)
+    return "".join(c for c in decomposed if not unicodedata.combining(c)).casefold().strip()
+
+
 def resolve_display_name(display_name: str, aliases: dict[str, list[str]]) -> str:
-    """The person a display name belongs to, or the name itself (case-insensitive)."""
+    """The person a display name belongs to, or the name itself.
+
+    Case-insensitive first; if nothing matches, accents are ignored too —
+    Zoom display names often lose them ("Iolanda Brandao" for "Iolanda
+    Brandão").  An accent-free match that points to two different people is
+    ambiguous and is not used.
+    """
     lower = display_name.lower()
     for person, names in aliases.items():
         if person.lower() == lower:
             return person
         if any(alias.lower() == lower for alias in names):
             return person
+
+    folded = fold_name(display_name)
+    found = {
+        person
+        for person, names in aliases.items()
+        if fold_name(person) == folded or any(fold_name(a) == folded for a in names)
+    }
+    if len(found) == 1:
+        return found.pop()
     return display_name
 
 

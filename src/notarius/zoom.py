@@ -139,12 +139,24 @@ def parse_zoom_chat(chat_path: Path, known_names: dict[str, str] | None = None) 
 
 
 def _resolve_chat_sender(sender: str, known: dict[str, str]) -> str:
+    """Exact (case-insensitive) match, then the same ignoring accents, then the
+    longest known name the sender starts with.  Known names that only differ
+    by accents but belong to different people are never used."""
+    from notarius.aliases import fold_name
+
     lower = sender.lower()
     if lower in known:
         return known[lower]
-    best, best_resolved = "", sender
+    folded: dict[str, str | None] = {}
     for key, resolved in known.items():
-        if lower.startswith(key) and len(key) > len(best):
+        fk = fold_name(key)
+        folded[fk] = resolved if folded.get(fk, resolved) == resolved else None
+    target = fold_name(sender)
+    if folded.get(target):
+        return folded[target]
+    best, best_resolved = "", sender
+    for key, resolved in folded.items():
+        if resolved and target.startswith(key) and len(key) > len(best):
             best, best_resolved = key, resolved
     return best_resolved
 

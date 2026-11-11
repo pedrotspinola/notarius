@@ -8,6 +8,7 @@ import pytest
 from notarius.pipeline import concat_audio_files, concat_quote, probe_duration, should_mix
 from notarius.zoom import (
     _extract_display_name,
+    _resolve_chat_sender,
     extract_meeting_datetime,
     is_zoom_folder,
     parse_zoom_chat,
@@ -100,3 +101,16 @@ def test_chat_formats(tmp_path):
         ("Vicente", "oi\nsegunda linha"),
         ("Iolanda", "olá"),
     ]
+
+
+def test_chat_sender_ignores_accents():
+    known = {"iolanda brandão": "Iolanda", "teodoro lim": "Teodoro Lima", "vicente": "Vicente"}
+    assert _resolve_chat_sender("Iolanda Brandao", known) == "Iolanda"
+    assert _resolve_chat_sender("Teodoro Limá", known) == "Teodoro Lima"  # prefix, accent added
+    assert _resolve_chat_sender("Vicente", known) == "Vicente"
+    assert _resolve_chat_sender("Odete", known) == "Odete"
+    # Two known names that fold together but are different people: unused.
+    ambiguous = {"odete": "Odete Prado", "odéte": "Odéte Ramos"}
+    assert _resolve_chat_sender("Odète", ambiguous) == "Odète"
+    assert _resolve_chat_sender("Odète Costa", ambiguous) == "Odète Costa"
+    assert _resolve_chat_sender("ODÉTE", ambiguous) == "Odéte Ramos"

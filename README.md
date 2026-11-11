@@ -68,7 +68,9 @@ a Portuguese wav2vec2 model, speaker separation with
 [pyannote](https://github.com/pyannote/pyannote-audio), and voice
 recognition with WeSpeaker embeddings scored by adaptive score
 normalization (AS-Norm), plus a second check of every segment to catch
-labels that mix two people.
+labels that mix two people. Zoom recordings with one audio file per
+person need no voice matching; there, lines the speech model invents
+over a person's silent stretches are removed.
 
 ## Licence
 

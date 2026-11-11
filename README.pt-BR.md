@@ -70,7 +70,9 @@ palavras com um modelo wav2vec2 de português, separação de falantes com o
 [pyannote](https://github.com/pyannote/pyannote-audio) e reconhecimento de
 voz com embeddings WeSpeaker pontuados por normalização adaptativa de
 pontuação (AS-Norm), mais uma segunda verificação de cada trecho para
-pegar rótulos que misturam duas pessoas.
+pegar rótulos que misturam duas pessoas. Gravações do Zoom com um arquivo
+de áudio por pessoa dispensam o reconhecimento de voz; nelas, as falas que
+o modelo inventa sobre os silêncios de cada pessoa são removidas.
 
 ## Licença
 

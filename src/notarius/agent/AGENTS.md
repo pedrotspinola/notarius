@@ -65,6 +65,13 @@ the app → *Ajustes → Preparar agora*.
 - `events[]`: per-segment checks (`reassigned`, `gated`, `suspect`,
   `flagged`, `possible`) with the segment `index`.
 - `listed_attendees`: who the user said was present.
+- `silence_filter` (Zoom recordings with one audio file per person): lines
+  Whisper invented over silence in that person's own track were removed —
+  `events[]` with `action: "dropped"`, the text and its level (`peak_db`).
+  `action: "quiet"` lines were kept but are faint; a lone "Tchau.",
+  "Obrigado." or "E aí" among them, in the middle of someone else's speech,
+  is probably invented too. There is no command to delete a line: point
+  such lines out to the user. Times are seconds in that person's track.
 
 ## How to find out who is speaking — in this order
 

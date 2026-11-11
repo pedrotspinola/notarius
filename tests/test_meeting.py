@@ -53,6 +53,20 @@ def test_json_round_trip(tmp_path):
     assert loaded.date == m.date and loaded.render_text() == m.render_text()
 
 
+
+def test_silence_filter_record_round_trip(tmp_path):
+    sf = {"drop_below_db": -35.0, "review_below_db": -20.0,
+          "events": [{"action": "dropped", "speaker": "Vicente", "start": 3.0,
+                      "end": 3.4, "text": "E aí", "peak_db": -70.3}]}
+    m = Meeting("Reunião", "zoom", "/pasta", SEGMENTS, silence_filter=sf)
+    m.save(tmp_path / "r.json")
+    assert Meeting.load(tmp_path / "r.json").silence_filter == sf
+    # Records written before the filter existed (no key) still load.
+    plain = Meeting("Reunião", "file", "/a.mp3", SEGMENTS)
+    assert "silence_filter" not in plain.to_dict()
+    plain.save(tmp_path / "p.json")
+    assert Meeting.load(tmp_path / "p.json").silence_filter == {}
+
 def test_rename_speaker_command(tmp_path):
     from notarius.cli import main
 

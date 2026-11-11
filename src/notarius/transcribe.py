@@ -23,6 +23,7 @@ from collections.abc import Callable
 from importlib import resources
 from pathlib import Path
 
+import numpy as np
 import torch
 import whisperx
 
@@ -273,16 +274,72 @@ def split_at_speaker_changes(raw_segments: list[dict]) -> list[TranscriptionSegm
     return out
 
 
+def _peak_db(audio, start: float, end: float, pad: float = 0.5, sample_rate: int = 16000) -> float:
+    """Peak level (dBFS) of *audio* over [start - pad, end + pad] seconds."""
+    lo = max(0, int((start - pad) * sample_rate))
+    hi = min(len(audio), int((end + pad) * sample_rate))
+    if hi <= lo:
+        return -180.0
+    return float(20 * np.log10(max(float(np.abs(audio[lo:hi]).max()), 1e-9)))
+
+
+def filter_silent_segments(
+    segments: list[IdentifiedSegment],
+    audio,
+    drop_below_db: float,
+    quiet_below_db: float,
+    quiet_track_min_segments: int = 3,
+) -> tuple[list[IdentifiedSegment], list[dict]]:
+    """Drop segments that sit on silence in their speaker's own track.
+
+    Only valid when *audio* holds ONE person (a Zoom per-participant
+    track): silence there means that person said nothing, so the text was
+    invented by Whisper.  Returns ``(kept, events)``; each event has an
+    ``action``: ``"dropped"`` (peak < drop_below_db), ``"quiet"`` (kept,
+    peak < quiet_below_db — worth a listen) or ``"track_too_quiet"``
+    (nothing dropped: at least *quiet_track_min_segments* segments are
+    audible and their median peak is under quiet_below_db, so the
+    microphone itself is quiet and an absolute cut could remove real
+    speech).  With fewer audible segments the track's level cannot be
+    judged — typically a silent attendee's track holding a cough and some
+    invented lines — and the filter applies.
+    """
+    peaks = [_peak_db(audio, s.start, s.end) for s in segments]
+    loud = [p for p in peaks if p >= drop_below_db]
+    if len(loud) >= quiet_track_min_segments and float(np.median(loud)) < quiet_below_db:
+        return list(segments), [{
+            "action": "track_too_quiet",
+            "speaker": segments[0].speaker_name,
+            "median_peak_db": round(float(np.median(loud)), 1),
+        }]
+    kept: list[IdentifiedSegment] = []
+    events: list[dict] = []
+    for seg, peak in zip(segments, peaks):
+        event = {"speaker": seg.speaker_name, "start": round(seg.start, 2),
+                 "end": round(seg.end, 2), "text": seg.text, "peak_db": round(peak, 1)}
+        if peak < drop_below_db:
+            events.append({"action": "dropped", **event})
+            continue
+        if peak < quiet_below_db:
+            events.append({"action": "quiet", **event})
+        kept.append(seg)
+    return kept, events
+
+
 def transcribe_per_participant(
     audio_files: dict[str, str | Path],
     config: PipelineConfig,
     progress: Progress | None = None,
+    silence: list[dict] | None = None,
 ) -> list[IdentifiedSegment]:
     """Transcribe one-person tracks (Zoom "separate audio per participant").
 
     No diarization: each file says who is speaking.  Whisper and the
     alignment model are each loaded once for all files.  Returns segments
-    from every track in time order (not merged).
+    from every track in time order (not merged).  When
+    ``config.drop_silent_segments``, lines sitting on silence in their own
+    track are dropped (see :func:`filter_silent_segments`) and the filter's
+    events are appended to *silence*.
     """
     if not audio_files:
         return []
@@ -317,16 +374,28 @@ def transcribe_per_participant(
                 segs, align_model, align_metadata, audio,
                 device=config.device, return_char_alignments=False,
             )
-            del audio
+            own: list[IdentifiedSegment] = []
             for seg in aligned["segments"]:
                 text = seg.get("text", "").strip()
                 if text:
                     # The label is the track key, so the segment's audio is
                     # found even after the user renames the speaker.
-                    out.append(IdentifiedSegment(
+                    own.append(IdentifiedSegment(
                         float(seg["start"]), float(seg["end"]), text, name, 1.0,
                         label=name, origin="track",
                     ))
+            if config.drop_silent_segments and own:
+                own, events = filter_silent_segments(
+                    own, audio, config.silent_segment_peak_db,
+                    config.quiet_segment_peak_db, config.quiet_track_min_segments,
+                )
+                if silence is not None:
+                    silence.extend(events)
+                dropped = sum(e["action"] == "dropped" for e in events)
+                if dropped:
+                    report("align", f"{name}: removed {dropped} line(s) heard over silence")
+            del audio
+            out.extend(own)
         del align_model, align_metadata
         _free_memory()
 

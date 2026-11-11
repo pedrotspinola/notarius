@@ -255,7 +255,8 @@ def _run_zoom(
                 concat_audio_files(paths, target)
             tracks[person] = str(target)
 
-        segments = transcribe_per_participant(tracks, config, progress)
+        silence: list[dict] = []
+        segments = transcribe_per_participant(tracks, config, progress, silence=silence)
         meeting = Meeting(
             title=folder.name,
             source_kind="zoom",
@@ -265,6 +266,12 @@ def _run_zoom(
             tracks=tracks,
             listed_attendees=listed,
         )
+        if config.drop_silent_segments:
+            meeting.silence_filter = {
+                "drop_below_db": config.silent_segment_peak_db,
+                "review_below_db": config.quiet_segment_peak_db,
+                "events": silence,
+            }
         names = {pa.display_name.lower(): resolve_display_name(pa.display_name, aliases)
                  for pa in recording.participant_audio}
 

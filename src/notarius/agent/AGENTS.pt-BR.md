@@ -70,6 +70,14 @@ ao aplicativo → *Ajustes → Preparar agora*.
 - `events[]`: verificações por trecho (`reassigned`, `gated`, `suspect`,
   `flagged`, `possible`) com o `index` do trecho.
 - `listed_attendees`: quem a pessoa disse que estava presente.
+- `silence_filter` (gravações do Zoom com um arquivo de áudio por pessoa):
+  falas que o Whisper inventou sobre o silêncio da faixa da própria pessoa
+  foram removidas — `events[]` com `action: "dropped"`, o texto e o nível
+  (`peak_db`). As de `action: "quiet"` ficaram, mas são baixas; um "Tchau.",
+  "Obrigado." ou "E aí" solto entre elas, no meio da fala de outra pessoa,
+  provavelmente também foi inventado. Não há comando para apagar uma linha:
+  aponte essas falas para a pessoa. Os tempos são segundos da faixa daquela
+  pessoa.
 
 ## Como descobrir quem está falando — nesta ordem
 

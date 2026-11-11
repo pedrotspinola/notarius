@@ -281,6 +281,22 @@ class PipelineConfig:
     # long enough is re-scored on its own to catch labels that contain more
     # than one person.  The accept bar is higher than the label's because
     # single clips are noisier (unenrolled voices peaked at 3.21 per clip).
+    # Silence filter for Zoom one-track-per-person recordings.  Each track
+    # holds one person, and Whisper invents text on its silent stretches
+    # ("E aí", "Obrigado.", "Tchau.", subtitle credits) that would otherwise
+    # land under that person's name — even making a silent attendee look
+    # like a speaker.  A segment whose own span (+-0.5 s) peaks below
+    # silent_segment_peak_db on its track is dropped.  Measured on three
+    # real meetings (43 tracks, ~4,300 segments): all 75 lines dropped at
+    # -35 dB were invented text, real speech sat at -2..-9 dB per track and
+    # never below -29 dB.  Segments under quiet_segment_peak_db are kept and
+    # recorded for review; a track with at least quiet_track_min_segments
+    # audible segments whose median peak is under it (a weak microphone) is
+    # left unfiltered.
+    drop_silent_segments: bool = True
+    silent_segment_peak_db: float = -35.0
+    quiet_segment_peak_db: float = -20.0
+    quiet_track_min_segments: int = 3
     verify_segments: bool = True
     verify_min_duration: float = 3.0
     verify_accept: float = 3.5

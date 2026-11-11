@@ -101,6 +101,9 @@ class Meeting:
     labels: list[dict] = field(default_factory=list)
     events: list[dict] = field(default_factory=list)
     chat: list[ChatMessage] = field(default_factory=list)
+    # Zoom one-track-per-person: lines dropped as heard over silence, and
+    # quiet ones kept (see transcribe.filter_silent_segments).
+    silence_filter: dict = field(default_factory=dict)
     settings: dict = field(default_factory=dict)
     review_status: str = "pending"  # "pending" | "done"
     learned: list[str] = field(default_factory=list)  # voices already learned from it
@@ -208,6 +211,7 @@ class Meeting:
                 for s in self.segments
             ],
             "chat": [asdict(c) for c in self.chat],
+            **({"silence_filter": self.silence_filter} if self.silence_filter else {}),
         }
 
     @classmethod
@@ -237,6 +241,7 @@ class Meeting:
                 for s in data["segments"]
             ],
             chat=[ChatMessage(**c) for c in data.get("chat") or []],
+            silence_filter=data.get("silence_filter") or {},
         )
 
     def save(self, json_path: Path) -> Path:

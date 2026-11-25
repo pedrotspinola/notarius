@@ -1,6 +1,6 @@
 # Changelog · Histórico de versões
 
-## Unreleased · Ainda não lançado
+## 0.1.1
 
 - Zoom recordings with one audio file per person: lines the speech model
   invents over silence ("E aí", "Obrigado.", "Tchau.") are removed instead
